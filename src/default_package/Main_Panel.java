@@ -10,9 +10,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import net.miginfocom.swing.MigLayout;
+
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +45,7 @@ public class Main_Panel extends JFrame {
 	JLabel profilePicLabel;
 	JLabel uploadResultLabel;
 	JTextArea captionTextArea;
+	JPanel feedPanel;
 	
 	//INHERITED USER VARIABLES
 	public String username = "opsf";
@@ -77,12 +82,18 @@ public class Main_Panel extends JFrame {
 		setContentPane(contentPane);
 		
 		splitPane = new JSplitPane();
-		splitPane.setResizeWeight(0.7);
+		splitPane.setResizeWeight(0.6);
 		splitPane.setDividerSize(0);
 		contentPane.add(splitPane, BorderLayout.CENTER);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		splitPane.setLeftComponent(scrollPane);
+		
+		feedPanel = new JPanel(new MigLayout("filly"));
+		feedPanel.setBackground(Color.DARK_GRAY);
+		
+		scrollPane.getViewport().setView(feedPanel);
+		//splitPane.setLeftComponent(feedPanel);
 		
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.GRAY);
@@ -110,7 +121,7 @@ public class Main_Panel extends JFrame {
 					
 					//INSERT INTO POSTS DATABASE
 					String postsQuery = "INSERT INTO `posts` (`id`, `upload_date`, `file_path`, `uploader`, `caption`) VALUES"
-							+ "('" + postId + "', CURRENT_TIME(), 'localhost/java_project/" + resultFilePath + "', '" + username + "', '" + captionTextArea.getText() + "');";
+							+ "('" + postId + "', CURRENT_TIME(), 'http://localhost/java_project/" + resultFilePath + "', '" + username + "', '" + captionTextArea.getText() + "');";
 					dbQueries.ExecuteQuery(postsQuery);
 					//System.out.println(postsQuery);
 					
@@ -193,6 +204,47 @@ public class Main_Panel extends JFrame {
 		profilePicLabel.setIcon(a);
 		welcomeUserLabel.setText("<html>Welcome back,<br><font color=\"#0000FF\" size=4>" + username + "</font></html>");
 		
+		//GET FEED HERE
+		getFeed();
+	}
+	
+	void getFeed()
+	{
+		ResultSet feedResult = dbQueries.GetFeed();
+		
+		try {
+			while (feedResult.next()) {
+				JPanel rootPanel = new JPanel(new MigLayout("filly"));
+				rootPanel.setBackground(Color.GRAY);
+				
+				JPanel leftPanel = new JPanel(new MigLayout("filly, wrap 1"));
+				leftPanel.setBackground(Color.GRAY);
+				rootPanel.add(leftPanel);
+				
+				JPanel rightPanel = new JPanel(new MigLayout("filly"));
+				rightPanel.setBackground(Color.GRAY);
+				rootPanel.add(rightPanel);
+				
+				JLabel image = new JLabel();
+				image.setPreferredSize(new Dimension(150, 150));
+				leftPanel.add(image);
+				image.setIcon(dbQueries.GetImageFromURL(feedResult.getString("file_path"), leftPanel.getWidth() == 0 ? 170 : leftPanel.getWidth()));
+				
+				JLabel usernameLabel = new JLabel();
+				usernameLabel.setText(username);
+				leftPanel.add(usernameLabel, "span 1 2, growy");
+				
+				JLabel captionLabel = new JLabel();
+				captionLabel.setMaximumSize(new Dimension(100, 200));
+				captionLabel.setText("<html>" + feedResult.getString("caption") + "</html>");
+				rightPanel.add(captionLabel, "span 3");
+				
+				feedPanel.add(rootPanel, "wrap");
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
     public static String uploadFile(String fileId, String filePath/*, String serverURL*/) throws IOException {

@@ -8,5 +8,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Users/deniz/Desktop/Eclipse Portable/Libraries/httpclient-4.5.13.jar"/>
 	<classpathentry kind="lib" path="C:/Users/deniz/Desktop/Eclipse Portable/Libraries/mysql-connector-java-8.0.27.jar"/>
+	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

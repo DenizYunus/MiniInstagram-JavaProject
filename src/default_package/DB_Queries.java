@@ -71,6 +71,15 @@ public class DB_Queries {
 			return null;
 		}
 	}
+	
+	public ImageIcon GetImageFromURL(String _url, Integer _photoSizes)
+	{
+		try {
+		BufferedImage masterNotResized = ImageIO.read(new URL(_url).openStream());
+		BufferedImage master = resizeImage(masterNotResized, _photoSizes, _photoSizes);
+		return new ImageIcon(master);
+		} catch (Exception e) {e.printStackTrace(); return null;}
+	}
 
 	public ImageIcon GetUserProfilePic(String _username) {
 		Integer photoSizes = 110;
