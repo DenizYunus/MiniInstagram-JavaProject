@@ -74,8 +74,9 @@ public class Main_Panel extends JFrame {
 	 * Create the frame.
 	 */
 	public Main_Panel() {
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 674, 552);
+		setBounds(100, 100, 800, 552);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(200, 0));
@@ -236,7 +237,8 @@ public class Main_Panel extends JFrame {
 				
 				JLabel captionLabel = new JLabel();
 				captionLabel.setMaximumSize(new Dimension(100, 200));
-				captionLabel.setText("<html>" + feedResult.getString("caption") + "</html>");
+				captionLabel.setText("<html>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<br>"
+						+ feedResult.getString("caption") + "</html>");
 				rightPanel.add(captionLabel, "span 3");
 				
 				feedPanel.add(rootPanel, "wrap");
