@@ -34,6 +34,14 @@ public class DB_Queries {
 		}
 	}
 	
+	public void CloseConnection()
+	{
+		try {
+			if (!dbCon.isClosed())
+				dbCon.close();
+		} catch (Exception e) { e.printStackTrace(); }
+	}
+	
 	public ResultSet GetFeed()
 	{
 		ResultSet rs;

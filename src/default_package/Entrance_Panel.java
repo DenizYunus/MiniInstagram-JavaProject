@@ -6,6 +6,8 @@ import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.awt.image.BufferedImage;
 import java.awt.Image;
 
@@ -25,11 +27,13 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Font;
 
 public class Entrance_Panel extends JFrame {
 
 	private JPanel contentPane;
-
+	DB_Queries DBQueries;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -58,6 +62,8 @@ public class Entrance_Panel extends JFrame {
 		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
+		
+		DBQueries = new DB_Queries(null, null);
 		
 		JPanel panel = new JPanel();
 	    contentPane.add(panel, BorderLayout.CENTER);
@@ -106,7 +112,15 @@ public class Entrance_Panel extends JFrame {
 	    divider_1.setBounds(200, 170, 400, 30);
 	    loginPanel.add(divider_1);
 	    
-	    JLabel emailAddressLabel = new JLabel("EMAIL ADDRESS");
+	    JLabel loginResultLabel = new JLabel();
+	    loginResultLabel.setFont(new Font("Tahoma", Font.PLAIN, 10));
+	    loginResultLabel.setLocation(250, 190);
+	    loginResultLabel.setSize(300, 20);
+	    loginResultLabel.setForeground(Color.RED);
+	    
+	    loginPanel.add(loginResultLabel);
+	    
+	    JLabel emailAddressLabel = new JLabel("USERNAME");
 	    emailAddressLabel.setForeground(Color.LIGHT_GRAY);
 	    emailAddressLabel.setBounds(250, 200, 300, 30);
 	    loginPanel.add(emailAddressLabel);
@@ -115,16 +129,16 @@ public class Entrance_Panel extends JFrame {
 	    emailField.addFocusListener(new FocusAdapter() {
 	    	@Override
 	    	public void focusGained(FocusEvent e) {
-	    		if (emailField.getText().equals("Enter Your Email Here")) emailField.setText("");
+	    		if (emailField.getText().equals("Enter Your Username Here")) emailField.setText("");
 	    	}
 	    	@Override
 	    	public void focusLost(FocusEvent e) {
-	    		if (emailField.getText().equals("")) emailField.setText("Enter Your Email Here");	    		
+	    		if (emailField.getText().equals("")) emailField.setText("Enter Your Username Here");	    		
 	    	}
 	    });
 	    emailField.setForeground(Color.WHITE);
 	    emailField.setBackground(Color.decode("#8E806A"));
-	    emailField.setText("Enter Your Email Here");
+	    emailField.setText("Enter Your Username Here");
 	    emailField.setBounds(250, 225, 300, 30);
 	    loginPanel.add(emailField);
 	    
@@ -160,6 +174,31 @@ public class Entrance_Panel extends JFrame {
 	    loginPanel.add(passwordField);
 	    
 	    JButton loginButton = new JButton("Login");
+	    loginButton.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		String query = "SELECT EXISTS (\r\n"
+	    				+ "  SELECT * FROM users WHERE username = \"" + emailField.getText() + "\" AND password = \"" + passwordField.getText() + "\"\r\n"
+	    				+ ")";
+	    		ResultSet rs = DBQueries.GetQuery(query);
+	    		try {
+	    			rs.beforeFirst();
+	    			rs.next();
+					if (rs.getString(1).equals("1"))
+					{
+						Main_Panel mainPanel = new Main_Panel(emailField.getText());
+						
+						//mainPanel.username = emailField.getText();
+						System.out.println(emailField.getText());
+						mainPanel.setVisible(true);
+					} else
+					{
+						loginResultLabel.setText("Wrong username or password.");
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+	    	}
+	    });
 	    loginButton.setBounds(240, 320, 320, 40);
 	    loginButton.setForeground(Color.DARK_GRAY);
 	    loginButton.setBackground(Color.LIGHT_GRAY);
@@ -197,7 +236,7 @@ public class Entrance_Panel extends JFrame {
 	    JLabel registerLogoLabel = new JLabel();
 	    registerLogoLabel.setForeground(Color.WHITE);
 	    registerLogoLabel.setBounds(355, 30, 100, 100);
-
+	    
 		try {
 			File imageFile = new File("images\\talia_logo.png");
 		    System.out.println(imageFile.exists());
@@ -221,6 +260,12 @@ public class Entrance_Panel extends JFrame {
 	    divider_r.setBounds(200, 150, 400, 30);
 	    registerPanel.add(divider_r);
 	    
+	    JLabel registerResultLabel = new JLabel();
+	    registerResultLabel.setForeground(Color.RED);
+	    registerResultLabel.setFont(new Font("Tahoma", Font.PLAIN, 10));
+	    registerResultLabel.setBounds(250, 170, 250, 20);
+	    registerPanel.add(registerResultLabel);
+	    
 	    JLabel emailAddressLabelRegister = new JLabel("EMAIL ADDRESS");
 	    emailAddressLabelRegister.setForeground(Color.LIGHT_GRAY);
 	    emailAddressLabelRegister.setBounds(250, 180, 300, 30);
@@ -243,9 +288,31 @@ public class Entrance_Panel extends JFrame {
 	    emailFieldRegister.setBounds(250, 205, 300, 30);
 	    registerPanel.add(emailFieldRegister);
 	    
+	    JLabel usernameLabelRegister = new JLabel("USERNAME");
+	    usernameLabelRegister.setForeground(Color.LIGHT_GRAY);
+	    usernameLabelRegister.setBounds(250, 235, 300, 30);
+	    registerPanel.add(usernameLabelRegister);
+	    
+	    JTextField usernameFieldRegister = new JTextField();
+	    usernameFieldRegister.addFocusListener(new FocusAdapter() {
+	    	@Override
+	    	public void focusGained(FocusEvent e) {
+	    		if (usernameFieldRegister.getText().equals("Enter Your Username Here")) usernameFieldRegister.setText("");
+	    	}
+	    	@Override
+	    	public void focusLost(FocusEvent e) {
+	    		if (usernameFieldRegister.getText().equals("")) usernameFieldRegister.setText("Enter Your Username Here");	    		
+	    	}
+	    });
+	    usernameFieldRegister.setForeground(Color.WHITE);
+	    usernameFieldRegister.setBackground(Color.decode("#8E806A"));
+	    usernameFieldRegister.setText("Enter Your Username Here");
+	    usernameFieldRegister.setBounds(250, 260, 300, 30);
+	    registerPanel.add(usernameFieldRegister);
+	    
 	    JLabel passwordLabelRegister = new JLabel("PASSWORD");
 	    passwordLabelRegister.setForeground(Color.LIGHT_GRAY);
-	    passwordLabelRegister.setBounds(250, 230, 300, 30);
+	    passwordLabelRegister.setBounds(250, 290, 300, 30);
 	    registerPanel.add(passwordLabelRegister);
 	    
 	    JPasswordField passwordFieldRegister = new JPasswordField();
@@ -271,12 +338,12 @@ public class Entrance_Panel extends JFrame {
 	    passwordFieldRegister.setEchoChar((char) 0);
 	    passwordFieldRegister.setBackground(Color.decode("#8E806A"));
 	    passwordFieldRegister.setText("Enter Your Password Here");
-	    passwordFieldRegister.setBounds(250, 255, 300, 30);
+	    passwordFieldRegister.setBounds(250, 315, 300, 30);
 	    registerPanel.add(passwordFieldRegister);
 	    
 	    JLabel passwordLabelRegisterAgain = new JLabel("PASSWORD REPEAT");
 	    passwordLabelRegisterAgain.setForeground(Color.LIGHT_GRAY);
-	    passwordLabelRegisterAgain.setBounds(250, 280, 300, 30);
+	    passwordLabelRegisterAgain.setBounds(250, 345, 300, 30);
 	    registerPanel.add(passwordLabelRegisterAgain);
 	    
 	    JPasswordField passwordFieldRegisterAgain = new JPasswordField();
@@ -302,11 +369,36 @@ public class Entrance_Panel extends JFrame {
 	    passwordFieldRegisterAgain.setEchoChar((char) 0);
 	    passwordFieldRegisterAgain.setBackground(Color.decode("#8E806A"));
 	    passwordFieldRegisterAgain.setText("Enter Your Password Again");
-	    passwordFieldRegisterAgain.setBounds(250, 305, 300, 30);
+	    passwordFieldRegisterAgain.setBounds(250, 370, 300, 30);
 	    registerPanel.add(passwordFieldRegisterAgain);
 	    
 	    JButton registerButton = new JButton("Register");
-	    registerButton.setBounds(240, 350, 320, 40);
+	    registerButton.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		if (usernameFieldRegister.getText().equals("Enter Your Username Here") || usernameFieldRegister.getText().equals(""))
+	    		{
+	    			registerResultLabel.setText("Please enter your username.");
+	    		} else
+	    		{
+	    			if (emailFieldRegister.getText().equals("") || emailFieldRegister.getText().equals("Enter Your Email Here"))
+	    			{
+	    				registerResultLabel.setText("Please enter your email.");
+	    			} else 
+	    			{
+			    		if (passwordFieldRegister.getText().equals(passwordFieldRegisterAgain.getText()))
+			    		{
+			    			String query = "INSERT INTO `users` (`UserID`, `username`, `email`, `password`, `post_count`, `biography`, `profile_pic`, `posts`) VALUES (NULL, '" + usernameFieldRegister.getText() + "', '" + emailFieldRegister.getText() + "', '" + passwordFieldRegister.getText() + "', '0', 'This guy is too lazy even cannot write a bio :(', 'http://localhost/java_project/profile-pictures/default.jpg', '');";
+			    			DBQueries.ExecuteQuery(query);
+			    			tabbedPane.setSelectedIndex(0);
+			    		} else
+			    		{
+			    			registerResultLabel.setText("Passwords do not match.");
+			    		}
+	    			}
+	    		}
+	    	}
+	    });
+	    registerButton.setBounds(240, 412, 320, 40);
 	    registerButton.setForeground(Color.DARK_GRAY);
 	    registerButton.setBackground(Color.LIGHT_GRAY);
 	    registerPanel.add(registerButton);
@@ -317,7 +409,7 @@ public class Entrance_Panel extends JFrame {
 	    		tabbedPane.setSelectedIndex(0);
 	    	}
 	    });
-	    loginTabButton.setBounds(320, 390, 160, 30); //240, 360, 160, 30);
+	    loginTabButton.setBounds(320, 452, 160, 30); //240, 360, 160, 30);
 	    loginTabButton.setBackground(new Color(0, 0, 0, 0));
 	    loginTabButton.setRolloverEnabled(false);
 	    loginTabButton.setBorder(null);
@@ -326,7 +418,7 @@ public class Entrance_Panel extends JFrame {
 	    JLabel divider_r2 = new JLabel("┖┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┚");
 	    divider_r2.setHorizontalAlignment(SwingConstants.CENTER);
 	    divider_r2.setForeground(Color.LIGHT_GRAY);
-	    divider_r2.setBounds(200, 410, 400, 30);
+	    divider_r2.setBounds(200, 472, 400, 30);
 	    registerPanel.add(divider_r2);
 	}
 }

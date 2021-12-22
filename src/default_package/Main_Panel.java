@@ -48,7 +48,7 @@ public class Main_Panel extends JFrame {
 	JPanel feedPanel;
 	
 	//INHERITED USER VARIABLES
-	public String username = "opsf";
+	public String username = "";
 	
 	
 	DB_Queries dbQueries;
@@ -61,7 +61,7 @@ public class Main_Panel extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Main_Panel frame = new Main_Panel();
+					Main_Panel frame = new Main_Panel("test");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -73,7 +73,7 @@ public class Main_Panel extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Main_Panel() {
+	public Main_Panel(String _username) {
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 552);
@@ -82,6 +82,7 @@ public class Main_Panel extends JFrame {
 		contentPane.setLayout(new BorderLayout(200, 0));
 		setContentPane(contentPane);
 		
+		username = _username;
 		splitPane = new JSplitPane();
 		splitPane.setResizeWeight(0.6);
 		splitPane.setDividerSize(0);
@@ -201,7 +202,7 @@ public class Main_Panel extends JFrame {
 		//START DATABASE PROCESSES
 		
 		dbQueries = new DB_Queries(username, null);
-		ImageIcon a = dbQueries.GetUserProfilePic("opsf");
+		ImageIcon a = dbQueries.GetUserProfilePic(username);
 		profilePicLabel.setIcon(a);
 		welcomeUserLabel.setText("<html>Welcome back,<br><font color=\"#0000FF\" size=4>" + username + "</font></html>");
 		
@@ -232,7 +233,7 @@ public class Main_Panel extends JFrame {
 				image.setIcon(dbQueries.GetImageFromURL(feedResult.getString("file_path"), leftPanel.getWidth() == 0 ? 170 : leftPanel.getWidth()));
 				
 				JLabel usernameLabel = new JLabel();
-				usernameLabel.setText(username);
+				usernameLabel.setText(feedResult.getString("uploader"));
 				leftPanel.add(usernameLabel, "span 1 2, growy");
 				
 				JLabel captionLabel = new JLabel();
