@@ -36,6 +36,8 @@ import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 public class Main_Panel extends JFrame {
 
@@ -169,7 +171,29 @@ public class Main_Panel extends JFrame {
 		panel.add(uploadButton);
 
 		captionTextArea = new JTextArea();
+		captionTextArea.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (captionTextArea.getText().equals("Enter the caption here"))
+				{
+					captionTextArea.setText("");
+					captionTextArea.setForeground(Color.BLACK);
+				}
+			}
+			
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				if (captionTextArea.getText().equals(""))
+				{
+					captionTextArea.setText("Enter the caption here");
+					captionTextArea.setForeground(Color.GRAY);
+				}
+			}
+		});
 		captionTextArea.setBounds(0, 221, 200, 88);
+		captionTextArea.setText("Enter the caption here");
+		captionTextArea.setForeground(Color.GRAY);
 		panel.add(captionTextArea);
 		
 		profilePicLabel = new JLabel("ProfilePicture");

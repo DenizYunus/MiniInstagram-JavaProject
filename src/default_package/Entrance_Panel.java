@@ -5,9 +5,14 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.awt.image.BufferedImage;
 import java.awt.Image;
 
@@ -22,26 +27,69 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
+
 
 public class Entrance_Panel extends JFrame {
 
 	private JPanel contentPane;
 	DB_Queries DBQueries;
+	static Entrance_Panel frame;
+	Boolean isCatJumpable = false;
 	
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent ke) {
+                synchronized (Entrance_Panel.class) {
+                    switch (ke.getID()) {
+                    case KeyEvent.KEY_PRESSED:
+                        if (ke.getKeyCode() == KeyEvent.VK_W)
+                        {
+                            wPressed = true;
+                        } if (ke.getKeyCode() == 65) //A
+                        {
+                        	aPressed = true;
+                        } if (ke.getKeyCode() == 68) //D
+                        {
+                        	dPressed = true;
+                        }
+                        break;
+
+                    case KeyEvent.KEY_RELEASED:
+                        if (ke.getKeyCode() == KeyEvent.VK_W) {
+                            wPressed = false;
+                        } if (ke.getKeyCode() == KeyEvent.VK_A)
+                        {
+                        	aPressed = false;
+                        } if (ke.getKeyCode() == KeyEvent.VK_D)
+                        {
+                        	dPressed = false;
+                        }
+                        break;
+                    }
+                    return false;
+                }
+            }
+        });
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Entrance_Panel frame = new Entrance_Panel();
+					frame = new Entrance_Panel();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -49,13 +97,32 @@ public class Entrance_Panel extends JFrame {
 			}
 		});
 	}
+	
+	private static volatile boolean wPressed = false;
+    public static boolean isWPressed() {
+        synchronized (Entrance_Panel.class) {
+            return wPressed;
+        }
+    }
+    private static volatile boolean aPressed = false;
+    public static boolean isAPressed() {
+        synchronized (Entrance_Panel.class) {
+            return aPressed;
+        }
+    }
+    private static volatile boolean dPressed = false;
+    public static boolean isDPressed() {
+        synchronized (Entrance_Panel.class) {
+            return dPressed;
+        }
+    }
 
 	/**
 	 * Create the frame.
 	 */
 	public Entrance_Panel() {
-		setTitle("MiniGram");
 		setResizable(false);
+		setTitle("MiniGram");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 552);
 		contentPane = new JPanel();
@@ -190,6 +257,7 @@ public class Entrance_Panel extends JFrame {
 						//mainPanel.username = emailField.getText();
 						System.out.println(emailField.getText());
 						mainPanel.setVisible(true);
+						frame.setVisible(false);
 					} else
 					{
 						loginResultLabel.setText("Wrong username or password.");
@@ -222,6 +290,16 @@ public class Entrance_Panel extends JFrame {
 	    divider_2.setForeground(Color.LIGHT_GRAY);
 	    divider_2.setBounds(200, 380, 400, 30);
 	    loginPanel.add(divider_2);
+	    
+	    JButton goOffline = new JButton("Go Offline Mode");
+	    goOffline.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		tabbedPane.setSelectedIndex(2);
+	    		
+	    	}
+	    });
+	    goOffline.setBounds(0, 0, 200, 200);
+	    loginPanel.add(goOffline);
 	    
 	    /*JButton forgetPassButton = new JButton("forget password");
 	    forgetPassButton.setBounds(400, 360, 160, 30);
@@ -420,5 +498,205 @@ public class Entrance_Panel extends JFrame {
 	    divider_r2.setForeground(Color.LIGHT_GRAY);
 	    divider_r2.setBounds(200, 472, 400, 30);
 	    registerPanel.add(divider_r2);
+	    
+	    JPanel gamePanel = new JPanel();
+	    tabbedPane.addTab("game", null, gamePanel, null);
+	    gamePanel.setLayout(null);
+	    
+	    JLabel backgroundLabel = new JLabel("New label");
+	    backgroundLabel.setBounds(-5, 0, 805, 523);
+	    
+	    try {
+			File imageFile = new File("images\\background.jpg");
+		    
+			BufferedImage img = null;
+			
+			img = ImageIO.read(imageFile);
+			Image dimg = img.getScaledInstance(backgroundLabel.getWidth(), backgroundLabel.getHeight(),
+			        Image.SCALE_SMOOTH);
+			
+			ImageIcon logo = new ImageIcon(dimg);
+			backgroundLabel.setIcon(logo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	    
+	    
+	    
+	    JLabel catImageLabel = new JLabel();
+	    catImageLabel.setBounds(30, 345, 60, 60);
+	    
+	    try {
+			File imageFile = new File("images\\cat.png");
+		    
+			BufferedImage img = null;
+			
+			img = ImageIO.read(imageFile);
+			Image dimg = img.getScaledInstance(catImageLabel.getWidth(), catImageLabel.getHeight(),
+			        Image.SCALE_SMOOTH);
+			
+			ImageIcon logo = new ImageIcon(dimg);
+			catImageLabel.setIcon(logo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	    gamePanel.add(catImageLabel);
+	    
+	    
+	    
+	    JLabel[] dogs = new JLabel[2];
+	    int[][] dogPos = {{700, 340}, {1300, 340}};
+	    
+	    int[] catPos = {30, 345};
+	    
+	    JLabel dogImageLabel = new JLabel();
+	    dogImageLabel.setBounds(450, 345, 90, 60);
+	    
+	    try {
+			File imageFile = new File("images\\dog.png");
+		    
+			BufferedImage img = null;
+			
+			img = ImageIO.read(imageFile);
+			Image dimg = img.getScaledInstance(dogImageLabel.getWidth(), dogImageLabel.getHeight(),
+			        Image.SCALE_SMOOTH);
+			
+			ImageIcon logo = new ImageIcon(dimg);
+			dogImageLabel.setIcon(logo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	    gamePanel.add(dogImageLabel);
+	    dogs[0] = dogImageLabel;
+	    
+	    JLabel dog2ImageLabel = new JLabel();
+	    dog2ImageLabel.setBounds(700, 345, 90, 60);
+	    
+	    try {
+			File imageFile = new File("images\\dog.png");
+		    
+			BufferedImage img = null;
+			
+			img = ImageIO.read(imageFile);
+			Image dimg = img.getScaledInstance(dog2ImageLabel.getWidth(), dog2ImageLabel.getHeight(),
+			        Image.SCALE_SMOOTH);
+			
+			ImageIcon logo = new ImageIcon(dimg);
+			dog2ImageLabel.setIcon(logo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	    gamePanel.add(dog2ImageLabel);
+	    dogs[1] = dog2ImageLabel;
+	    
+	    
+	    
+	    
+	    
+	    gamePanel.add(backgroundLabel);
+	    
+
+	    
+	    int dogSpeed = 50;
+	    int catJumpSpeed = 25;
+	    int catGravity = 30;
+	    
+	    int catRunSpeed = 30;
+	    int catMaxHeight = 240;
+	    int catMinHeight = 345;
+	    int catMinX = 20;
+	    int catMaxX = 150;
+	    
+	    //START THE GAME IF THE INTERNET CONNECTION NOT AVAILABLE
+	    if (!netIsAvailable())
+	    {
+	    	tabbedPane.setSelectedIndex(2);
+	    	
+	    	Runnable runnable = new Runnable() {
+				@Override public void run() {
+			    	dogs[0].setBounds(dogPos[0][0], dogPos[0][1], 90, 60);
+			    	
+			    	dogPos[0][0] -= dogSpeed; //CHANGE DOG 1 X
+			    	if (dogPos[0][0] < 0)
+			    	{
+			    		dogPos[0][0] = 1300;
+			    	}
+			    	
+			    	dogs[1].setBounds(dogPos[1][0], dogPos[1][1], 90, 60);
+			    	
+			    	dogPos[1][0] -= dogSpeed; //CHANGE DOG 2 X
+			    	if (dogPos[1][0] < 0)
+			    	{
+			    		dogPos[1][0] = 1300;
+			    	}
+			    	
+			    	if (catPos[1] <= catMinHeight - catGravity && (!isCatJumpable || !isWPressed()))
+			    	{
+			    		catPos[1] += catGravity;
+			    	}
+			    	
+			    	if (isWPressed() && isCatJumpable)
+			    	{
+			    		catPos[1] -= catJumpSpeed;
+			    	}
+			    	
+			    	if (isAPressed() && catPos[0] > catMinX)
+			    		catPos[0] -= catRunSpeed;
+			    	else if (isDPressed() && catPos[0] < catMaxX)
+			    		catPos[0] += catRunSpeed;
+			    	
+			    	
+			    	if (catPos[1] < catMaxHeight)
+			    		isCatJumpable = false;
+			    	else if (catPos[1] > catMinHeight - catGravity)
+			    		isCatJumpable = true;
+			    	
+			    	catImageLabel.setBounds(catPos[0], catPos[1], 60, 60);
+			    	
+			    	if (((catPos[0] > dogPos[0][0] - 30) && (catPos[0] < dogPos[0][0] + 50) && //CHECK DOG 1 X
+			    			(catPos[1] > dogPos[0][1] - 30) && (catPos[1] < dogPos[0][1] + 30)) || //CHECK DOG 1 Y
+			    			((catPos[0] > dogPos[1][0] - 30) && (catPos[0] < dogPos[1][0] + 50) && 
+			    			(catPos[1] > dogPos[1][1] - 30) && (catPos[1] < dogPos[1][1] + 30))) //CHECK DOG 2 X
+			    	{
+			    		int answer = JOptionPane.showConfirmDialog(null, "Wanna play again?");
+			    		if (answer == 0)
+			    		{
+			    			dogPos[0][0] = 700;
+			    			dogPos[1][0] = 1300;
+			    			dogs[1].setBounds(1300, dogPos[1][1], 90, 60);
+			    			dogs[0].setBounds(700, dogPos[0][1], 90, 60);
+			    			catPos[1] = 345;
+			    			catPos[0] = 30;
+			    		} else if (answer == 1 || answer == 2)
+			    		{
+			    			System.exit(0);
+			    		}
+			    	}
+				}
+			};
+			
+			Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(
+				    runnable,
+				    0,
+				    100,
+				    TimeUnit.MILLISECONDS);
+		
+	    }
+	}
+	
+	
+	
+	private static boolean netIsAvailable() {
+	    try {
+	        final URL url = new URL("http://www.google.com");
+	        final URLConnection conn = url.openConnection();
+	        conn.connect();
+	        conn.getInputStream().close();
+	        return true;
+	    } catch (MalformedURLException e) {
+	        throw new RuntimeException(e);
+	    } catch (IOException e) {
+	        return false;
+	    }
 	}
 }
