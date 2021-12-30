@@ -298,7 +298,7 @@ public class Entrance_Panel extends JFrame {
 	    		
 	    	}
 	    });
-	    goOffline.setBounds(0, 0, 200, 200);
+	    goOffline.setBounds(0, 0, -16, -13);
 	    loginPanel.add(goOffline);
 	    
 	    /*JButton forgetPassButton = new JButton("forget password");
@@ -590,14 +590,18 @@ public class Entrance_Panel extends JFrame {
 	    dogs[1] = dog2ImageLabel;
 	    
 	    
+	    int score = 0;
 	    
+	    JLabel scoreLabel = new JLabel();
+	    scoreLabel.setBounds(100, 30, 950, 85);
+	    gamePanel.add(scoreLabel);
 	    
 	    
 	    gamePanel.add(backgroundLabel);
 	    
 
 	    
-	    int dogSpeed = 50;
+	    int dogSpeed = 70;
 	    int catJumpSpeed = 25;
 	    int catGravity = 30;
 	    
@@ -615,14 +619,13 @@ public class Entrance_Panel extends JFrame {
 	    	Runnable runnable = new Runnable() {
 				@Override public void run() {
 			    	dogs[0].setBounds(dogPos[0][0], dogPos[0][1], 90, 60);
+			    	dogs[1].setBounds(dogPos[1][0], dogPos[1][1], 90, 60);
 			    	
 			    	dogPos[0][0] -= dogSpeed; //CHANGE DOG 1 X
 			    	if (dogPos[0][0] < 0)
 			    	{
 			    		dogPos[0][0] = 1300;
 			    	}
-			    	
-			    	dogs[1].setBounds(dogPos[1][0], dogPos[1][1], 90, 60);
 			    	
 			    	dogPos[1][0] -= dogSpeed; //CHANGE DOG 2 X
 			    	if (dogPos[1][0] < 0)
@@ -652,6 +655,7 @@ public class Entrance_Panel extends JFrame {
 			    		isCatJumpable = true;
 			    	
 			    	catImageLabel.setBounds(catPos[0], catPos[1], 60, 60);
+			    	scoreLabel.setText("dsafa");
 			    	
 			    	if (((catPos[0] > dogPos[0][0] - 30) && (catPos[0] < dogPos[0][0] + 50) && //CHECK DOG 1 X
 			    			(catPos[1] > dogPos[0][1] - 30) && (catPos[1] < dogPos[0][1] + 30)) || //CHECK DOG 1 Y
